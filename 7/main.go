@@ -16,10 +16,12 @@ type edge struct {
 type node struct {
     label string
     containedBy []edge
+    contains []edge
 }
 
 func sanitizeLabel(label string) string {
-    s := strings.TrimSuffix(label, "bags")
+    s := strings.TrimSuffix(label, ".")
+    s = strings.TrimSuffix(s, "bags")
     s = strings.TrimSuffix(s, "bag")
     s = strings.TrimSpace(s)
     if label == s {
@@ -33,6 +35,7 @@ func createNode(label string) *node {
     n := &node{}
     n.label = sanitizeLabel(label)
     n.containedBy = make([]edge, 0)
+    n.contains = make([]edge, 0)
     nodes = append(nodes, n)
     return n
 }
@@ -70,11 +73,9 @@ func reachableHelper(done, todo []*node) []*node {
     if len(todo) == 0 {
         return done
     }
-    curNode := todo[0]
-    fmt.Printf("!!current node %v!!\n", curNode)
+    curNode := retrieveNode(todo[0].label)
     
     for _, e := range curNode.containedBy {
-        fmt.Printf("!! ede to %v\n", e.to)
         if !isIn(e.to, done) {
             done = append(done, e.to)
             todo = append(todo, e.to)
@@ -98,8 +99,7 @@ func parseLine(s string) *node {
     curCol := sanitizeLabel(spl[0]) // bag color
     n := retrieveNode(curCol)
     if n == nil {
-        // create node
-        n = createNode(spl[0])
+        n = createNode(curCol)
     }
     if strings.Contains(s, "no other") {
         return n
@@ -112,9 +112,7 @@ func parseLine(s string) *node {
         w, _ := strconv.Atoi(string(btxt[0]))
         e.weight = w //todo allow 2-digit numbers
 
-        removeBag := strings.TrimSuffix(btxt[2:], "bag")
-        removeBags := strings.TrimSuffix(removeBag, "bags")
-        lbl := strings.TrimSpace(removeBags)
+        lbl := sanitizeLabel(btxt[2:])
         tn := retrieveNode(lbl)
         if tn == nil {
             // create node
@@ -122,8 +120,21 @@ func parseLine(s string) *node {
         }
         e.to = n
         tn.containedBy = append(tn.containedBy, e)
+
+        e2 := edge{}
+        e2.weight = w
+        e2.to = tn
+        n.contains = append(n.contains, e2)
     }
     return n
+}
+
+func (n *node) size() int {
+    c := 1
+    for _, e := range n.contains {
+        c += e.weight * e.to.size()
+    }
+    return c
 }
 
 func main() {
@@ -134,7 +145,7 @@ func main() {
     }
     fmt.Printf("%v\n", nodes)
     n := retrieveNode("shiny gold")
-    fmt.Printf("%v\n", n.reachable())
+    fmt.Printf("shiny gold has %d bags\n", n.size() - 1)
 }
 
 func readInput(file string) []string {
