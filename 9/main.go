@@ -47,11 +47,8 @@ func isSum(is []int, t int) bool {
 }
 
 func rangeSum(is []int, t int) bool {
-    cs := make([]int, len(is))
-    copy(cs, is)
-    sort.Ints(cs)
     sum := 0
-    for _, i := range cs {
+    for _, i := range is {
         sum += i
     }
     return sum == t
@@ -97,8 +94,8 @@ func main() {
     }
 
     //part 2
-    for i := 0; i < len(ls) - 1; i++ {
-        for j := i + 1; j < len(ls); j++ {
+    for i := 0; i < len(is) - 1; i++ {
+        for j := i + 1; j < len(is); j++ {
             if rangeSum(is[i:j], magicNumber) {
                 mi := minSlice(is[i:j])
                 mx := maxSlice(is[i:j])
@@ -107,8 +104,6 @@ func main() {
         }
     }
 }
-
-
 
 func readInput(file string) []string {
 	dat, err := ioutil.ReadFile(file)
