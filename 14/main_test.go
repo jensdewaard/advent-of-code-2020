@@ -36,8 +36,8 @@ func TestReverse(t *testing.T) {
 		want Bitstring
 	}{
 		{"test", args{Bitstring("test")}, "tset"},
-		{"hidde", args{Bitstring("hidde")}, "eddih"},
-		{"wiggert", args{Bitstring("wiggert")}, "treggiw"},
+		{"trigonometry", args{Bitstring("trigonometry")}, "yrtemonogirt"},
+		{"foobar", args{Bitstring("foobar")}, "raboof"},
 		{"1234", args{Bitstring("1234")}, "4321"},
 	}
 	for _, tt := range tests {
@@ -64,6 +64,10 @@ func TestBitstringToFloat64(t *testing.T) {
 		{"0000", args{"0000"}, 0},
 		{"0", args{"0"}, 0},
 		{"00000", args{"00000"}, 0},
+		{"000000000000000000000000000000001011", args{"000000000000000000000000000000001011"}, 11},
+		{"000000000000000000000000000001001001", args{"000000000000000000000000000001001001"}, 73},
+		{"000000000000000000000000000001100101", args{"000000000000000000000000000001100101"}, 101},
+		{"000000000000000000000000000001000000", args{"000000000000000000000000000001000000"}, 64},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -90,7 +94,7 @@ func Test_mask(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := mask(tt.args.v, tt.args.m); got != tt.want {
+			if got := maskString(tt.args.v, tt.args.m); got != tt.want {
 				t.Errorf("mask() = %v, want %v", got, tt.want)
 			}
 		})

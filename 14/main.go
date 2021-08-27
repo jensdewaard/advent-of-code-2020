@@ -17,7 +17,7 @@ func readInput(file string) []string {
 	return strings.Split(text, "\n")
 }
 
-type MemoryInstruct struct {
+type MemoryInstruction struct {
     Address int
     Value   int
 }
@@ -108,8 +108,7 @@ func maskAddress(v Bitstring, m Bitmask) []*Bitstring {
 func main() {
     cs := readInput("input")
     var mask Bitmask = ""
-    var memory map[int]float64
-    memory = make(map[int]float64, 0)
+    memory := make(map[int]float64)
     for _, c := range cs {
         if strings.HasPrefix(c, "mask") {
             m := strings.TrimPrefix(c, "mask = ")
@@ -123,7 +122,7 @@ func main() {
             for _, a := range allMaskedAddress {
                 add := int(BitstringToFloat64(*a))
                 memory[add] = float64(newValue)
-                log.Printf("updated [%d] to %d\n", add, memory[add])
+                log.Printf("updated [%d] to %f\n", add, memory[add])
             }
             
             
