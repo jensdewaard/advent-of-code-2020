@@ -88,30 +88,39 @@ func maskString(v Bitstring, m Bitmask) Bitstring {
 	return Bitstring(result)
 }
 
+func parseSingleMaskBit(v Bitstring, c, o rune) []Bitstring {
+	switch c {
+	case 'X': // floating
+		return []Bitstring{
+			v.append('0'),
+			v.append('1'),
+		}
+	case '0':
+		return []Bitstring{v.append(o)}
+	case '1':
+		return []Bitstring{v.append('1')}
+	}
+	return []Bitstring{}
+}
+
+func flatten(bss [][]Bitstring) []Bitstring {
+	res := []Bitstring{}
+	for _, bs := range bss {
+		res = append(res, bs...)
+	}
+	return res
+}
+
 func maskAddress(v Bitstring, m Bitmask) []Bitstring {
 	result := make([]Bitstring, 1)
 	result[0] = Bitstring("")
 
 	for i, b := range m {
-		switch b {
-		case 'X': // floating
-			for _, r := range result {
-				newRzero := r + "0"
-				newRone := r + "1"
-				result = append(result, newRzero)
-				result = append(result, newRone)
-			}
-		case '0': //unchanged from v
-			for _, r := range result {
-				newR := r + Bitstring(v[i])
-				r = newR
-			}
-		case '1': // output 1
-			for _, r := range result {
-				newR := r + "1"
-				r = newR
-			}
+		news := make([][]Bitstring, 0)
+		for _, s := range result {
+			news = append(news, parseSingleMaskBit(s, b, rune(v[i])))
 		}
+		result = flatten(news)
 	}
 	return result
 }
@@ -127,6 +136,27 @@ func RunProgramOne(p Program) Memory {
 			maskedValue := maskString(floatToBitstring(float64(c.Value)), mask)
 			add := int(BitstringToFloat64(maskedValue))
 			memory[c.Address] = float64(add)
+		}
+	}
+	return memory
+}
+
+func RunProgramTwo(p Program) Memory {
+	var mask Bitmask = ""
+	memory := make(Memory)
+	for _, c := range p {
+		switch c := c.(type) {
+		case MaskAssignment:
+			mask = c.Mask
+		case MemoryInstruction:
+			maskedAddress := maskAddress(
+				floatToBitstring(float64(c.Address)),
+				mask,
+			)
+			for _, a := range maskedAddress {
+				address := BitstringToFloat64(a)
+				memory[int(address)] = float64(c.Value)
+			}
 		}
 	}
 	return memory

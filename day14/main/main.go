@@ -11,4 +11,7 @@ func main() {
 	memory := day14.RunProgramOne(p)
 
 	log.Printf("sum of memory %d\n", memory.Sum())
+
+	memory = day14.RunProgramTwo(p)
+	log.Printf("sum of memory2 %d\n", memory.Sum())
 }

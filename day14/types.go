@@ -22,6 +22,11 @@ type Bitmask string
 
 type Bitstring string
 
+func (b Bitstring) append(c rune) Bitstring {
+	s := string(b)
+	return Bitstring(s + string(c))
+}
+
 type Memory map[int]float64
 
 func (m Memory) Sum() int {

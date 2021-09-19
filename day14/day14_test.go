@@ -186,13 +186,28 @@ func Test_maskAddress(t *testing.T) {
 				"000000000000000000000000000000111011",
 			},
 		},
+		{
+			"example2",
+			Bitstring("000000000000000000000000000000011010"),
+			Bitmask("00000000000000000000000000000000X0XX"),
+			[]Bitstring{
+				"000000000000000000000000000000010000",
+				"000000000000000000000000000000010001",
+				"000000000000000000000000000000010010",
+				"000000000000000000000000000000010011",
+				"000000000000000000000000000000011000",
+				"000000000000000000000000000000011001",
+				"000000000000000000000000000000011010",
+				"000000000000000000000000000000011011",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := maskAddress(tt.address, tt.mask)
 			if len(got) != len(tt.want) {
 				t.Errorf("maskAddress() gives %d addresses, want %d", len(got), len(tt.want))
-                return
+				return
 			}
 			for i, s := range got {
 				if s != tt.want[i] {
