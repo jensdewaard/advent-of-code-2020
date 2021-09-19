@@ -4,7 +4,48 @@ import (
 	"testing"
 )
 
-func Test_iToBitstring(t *testing.T) {
+func Test_runProgramOne(t *testing.T) {
+	tests := []struct {
+		name  string
+		input Program
+		want  int
+	}{
+		{
+			"example",
+			Program{
+				MaskAssignment{Bitmask("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X")},
+				MemoryInstruction{8, 11},
+				MemoryInstruction{7, 101},
+				MemoryInstruction{8, 0},
+			},
+			165,
+		},
+		{
+			"example_part1",
+			Program{
+				MaskAssignment{Bitmask("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X")},
+				MemoryInstruction{8, 11},
+			},
+			73,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			memory := runProgramOne(tt.input)
+			var result = float64(0)
+			for _, v := range memory {
+				result += v
+			}
+
+			got := int(result)
+			if got != tt.want {
+				t.Errorf("runProgram() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_floatToBitstring(t *testing.T) {
 	type args struct {
 		n float64
 	}
@@ -19,7 +60,7 @@ func Test_iToBitstring(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := iToBitstring(tt.args.n); got != tt.want {
+			if got := floatToBitstring(tt.args.n); got != tt.want {
 				t.Errorf("iToBitstring() = %v, want %v", got, tt.want)
 			}
 		})
@@ -96,6 +137,67 @@ func Test_mask(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := maskString(tt.args.v, tt.args.m); got != tt.want {
 				t.Errorf("mask() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_memorySum(t *testing.T) {
+	tests := []struct {
+		name string
+		mem  Memory
+		want int
+	}{
+		{
+			"single value",
+			map[int]float64{5: float64(20)},
+			20,
+		},
+		{
+			"two values",
+			map[int]float64{1: float64(9), 9: float64(90)},
+			99,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.mem.Sum(); got != tt.want {
+				t.Errorf("memory.Sum() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_maskAddress(t *testing.T) {
+	tests := []struct {
+		name    string
+		address Bitstring
+		mask    Bitmask
+		want    []Bitstring
+	}{
+		{
+			"example",
+			Bitstring("000000000000000000000000000000101010"),
+			Bitmask("000000000000000000000000000000X1001X"),
+			[]Bitstring{
+				"000000000000000000000000000000011010",
+				"000000000000000000000000000000011011",
+				"000000000000000000000000000000111010",
+				"000000000000000000000000000000111011",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := maskAddress(tt.address, tt.mask)
+			if len(got) != len(tt.want) {
+				t.Errorf("maskAddress() gives %d addresses, want %d", len(got), len(tt.want))
+                return
+			}
+			for i, s := range got {
+				if s != tt.want[i] {
+					t.Errorf("maskAddress(%d) = %v, want %v", i, got[i], tt.want[i])
+				}
 			}
 		})
 	}
