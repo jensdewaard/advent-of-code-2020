@@ -1,4 +1,4 @@
-package main
+package day14
 
 import (
 	"testing"
@@ -31,7 +31,7 @@ func Test_runProgramOne(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			memory := runProgramOne(tt.input)
+			memory := RunProgramOne(tt.input)
 			var result = float64(0)
 			for _, v := range memory {
 				result += v

@@ -1,4 +1,4 @@
-package main
+package day14
 
 type Program []Command
 type Command interface {

@@ -1,4 +1,4 @@
-package main
+package day14
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func readInput(file string) Program {
+func ReadInput(file string) Program {
 	dat, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
@@ -116,14 +116,7 @@ func maskAddress(v Bitstring, m Bitmask) []Bitstring {
 	return result
 }
 
-func main() {
-	p := readInput("input")
-	memory := runProgramOne(p)
-
-	log.Printf("sum of memory %d\n", memory.Sum())
-}
-
-func runProgramOne(p Program) Memory {
+func RunProgramOne(p Program) Memory {
 	var mask Bitmask = ""
 	memory := make(Memory)
 	for _, c := range p {
